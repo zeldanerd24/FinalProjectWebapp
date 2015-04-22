@@ -10,7 +10,7 @@
 </head>
 <body>
     <div align="center">
-        <table border="0">
+        <table border="0" style="table-layout:fixed; width=150px">
             <tr>
                 <td colspan="2" align="center"><h2>Results</h2></td>
             </tr>
@@ -20,7 +20,7 @@
             </tr>
             <tr>
                 <td>Result:</td>
-                <td>${results.result}</td>
+                <td><div style="word-wrap: break-word;">${results.result}</div></td>
             </tr>
             <tr>
                 <td>IP of Host:</td>

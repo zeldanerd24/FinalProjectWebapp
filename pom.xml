@@ -93,6 +93,7 @@
     </dependencies>
 
     <build>
+        <finalName>FinalProjectWebapp</finalName>
 
         <plugins>
             <!-- For Maven Tomcat Plugin -->

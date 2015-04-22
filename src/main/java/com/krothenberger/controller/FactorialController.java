@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.net.InetAddress;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Created by Kevin on 4/21/2015.
@@ -39,13 +38,15 @@ public class FactorialController {
     @RequestMapping(method = RequestMethod.POST)
     public String returnFact(@ModelAttribute("factRequest") FactRequest factRequest,
                              Map<String, Object> model) throws Exception {
+        int number = factRequest.getNumber();
+
         Results results = new Results();
-        results.setNumber(factRequest.getNumber());
+        results.setNumber(number);
         results.setHostIp(InetAddress.getLocalHost().toString());
 
         SSHClient sshClient = new SSHClient();
-        sshClient.addHostKeyVerifier("9f:6b:5d:ad:9b:68:26:fb:88:0e:8d:8d:2f:b9:61:f6");
-        sshClient.addHostKeyVerifier("69:67:78:6c:c3:ee:84:c1:5d:bc:e7:9a:66:43:07:bb");
+        sshClient.addHostKeyVerifier("c4:5a:43:e4:86:32:fb:7b:49:4b:ee:99:7e:5f:d4:30");
+        sshClient.addHostKeyVerifier("f5:c3:5b:1a:64:73:99:05:15:29:0b:d9:f9:2f:a6:74");
 
         long startTime = System.currentTimeMillis();
 
@@ -58,8 +59,13 @@ public class FactorialController {
             sshClient.authPassword("krothenberger", "Blackhole24");
             Session session = sshClient.startSession();
             try {
-                Session.Command command = session.exec("./scripts/factfunction/factorial.py");
+                Session.Command command = session.exec("./scripts/factfunction/factorial.py " + number);
                 result = IOUtils.readFully(command.getInputStream()).toString();
+            } finally {
+                session.close();
+            }
+            session = sshClient.startSession();
+            try {
                 Session.Command ipCommand = session.exec("hostname -I");
                 ip = IOUtils.readFully(ipCommand.getInputStream()).toString();
             } finally {
@@ -72,8 +78,17 @@ public class FactorialController {
 
         long endTime = System.currentTimeMillis();
 
+        StringBuilder resultWithSpaces = new StringBuilder();
+
+        int i;
+        for(i=0; i+20 < result.length(); i+=20) {
+            resultWithSpaces.append(result.substring(i, i+20));
+            resultWithSpaces.append("\n");
+        }
+        resultWithSpaces.append(result.substring(i));
+
         results.setTime(endTime-startTime);
-        results.setResult(result);
+        results.setResult(resultWithSpaces.toString());
         results.setComputeIp(ip);
 
         model.put("results", results);
